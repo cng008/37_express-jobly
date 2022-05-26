@@ -51,8 +51,8 @@ router.post('/', ensureAdmin, async function (req, res, next) {
  */
 
 router.get('/', async function (req, res, next) {
-  const q = req.body;
-  // arrive as strings from querystring, but we want as ints
+  const q = req.query;
+  // convert to integers
   if (q.minEmployees !== undefined) q.minEmployees = +q.minEmployees;
   if (q.maxEmployees !== undefined) q.maxEmployees = +q.maxEmployees;
 

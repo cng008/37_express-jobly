@@ -105,7 +105,9 @@ describe('GET /companies', function () {
   });
 
   test('works: filtering', async function () {
-    const resp = await request(app).get('/companies').send({ minEmployees: 3 });
+    const resp = await request(app)
+      .get('/companies')
+      .query({ minEmployees: 3 });
     expect(resp.body).toEqual({
       companies: [
         {
@@ -122,7 +124,7 @@ describe('GET /companies', function () {
   test('works: filtering on all filters', async function () {
     const resp = await request(app)
       .get('/companies')
-      .send({ minEmployees: 2, maxEmployees: 3, name: '3' });
+      .query({ minEmployees: 2, maxEmployees: 3, name: '3' });
     expect(resp.body).toEqual({
       companies: [
         {
@@ -139,7 +141,7 @@ describe('GET /companies', function () {
   test('bad request if invalid filter key', async function () {
     const resp = await request(app)
       .get('/companies')
-      .send({ minEmployees: 2, nope: 'nope' });
+      .query({ minEmployees: 2, nope: 'nope' });
     expect(resp.statusCode).toEqual(400);
   });
 });
