@@ -19,12 +19,12 @@ class Job {
 
   static async create(data) {
     const result = await db.query(
-      `INSERT INTO jobs (title, 
-                        salary, 
-                        equity, 
-                        company_handle)
-           VALUES ($1, $2, $3, $4)
-           RETURNING id, title, salary, equity, company_handle AS "companyHandle"`,
+      `INSERT INTO jobs (title,
+                         salary,
+                         equity,
+                         company_handle)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, title, salary, equity, company_handle AS "companyHandle"`,
       [data.title, data.salary, data.equity, data.companyHandle]
     );
     const job = result.rows[0];
@@ -35,9 +35,9 @@ class Job {
   /** Find all jobs.
    *
    * searchFilters (all optional):
-   * - title (will find case-insensitive, partial matches)
    * - minSalary
    * - hasEquity (true returns only jobs with equity > 0, other values ignored)
+   * - title (will find case-insensitive, partial matches)
    *
    * Returns [{ id, title, salary, equity, companyHandle, companyName }, ...]
    * */
@@ -99,8 +99,8 @@ class Job {
                 salary,
                 equity,
                 company_handle AS "companyHandle"
-           FROM jobs
-           WHERE id = $1`,
+         FROM jobs
+         WHERE id = $1`,
       [id]
     );
 
@@ -109,12 +109,13 @@ class Job {
     if (!job) throw new NotFoundError(`No job: ${id}`);
 
     const companiesRes = await db.query(
-      `SELECT title,
-                salary,
-                equity,
-                company_handle AS "companyHandle"
-         FROM jobs
-         WHERE handle = $1`,
+      `SELECT handle,
+              name,
+              description,
+              num_employees AS "numEmployees",
+              logo_url AS "logoUrl"
+       FROM companies
+       WHERE handle = $1`,
       [job.companyHandle]
     );
 
@@ -141,12 +142,13 @@ class Job {
     const idVarIdx = '$' + (values.length + 1);
 
     const querySql = `UPDATE jobs 
-                      SET ${setCols} 
-                      WHERE handle = ${idVarIdx} 
-                      RETURNING title,
-                                salary,
-                                equity,
-                                company_handle AS "companyHandle"`;
+                    SET ${setCols} 
+                    WHERE id = ${idVarIdx} 
+                    RETURNING id, 
+                              title, 
+                              salary, 
+                              equity,
+                              company_handle AS "companyHandle"`;
     const result = await db.query(querySql, [...values, id]);
     const job = result.rows[0];
 
